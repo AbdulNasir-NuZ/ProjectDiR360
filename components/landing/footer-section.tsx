@@ -57,12 +57,12 @@ export function FooterSection() {
             {/* Brand Column */}
             <div className="col-span-2">
               <a href="#" className="inline-flex items-center gap-2 mb-6">
-                <span className="text-2xl font-display text-white">COMPUTE</span>
-                <span className="text-xs text-white/40 font-mono">TM</span>
+                <span className="text-2xl font-display text-white">DRX</span>
+                <span className="text-xs text-white/40 font-mono">360</span>
               </a>
 
               <p className="text-white/50 leading-relaxed mb-8 max-w-xs text-sm">
-                Autonomous AI agents for distributed computing. Delegate complex tasks to intelligent workers.
+                Verifiable startup identity for modern founders. Create, trust, and formalize your venture in one seamless workflow.
               </p>
 
               {/* Social Links */}
@@ -109,14 +109,16 @@ export function FooterSection() {
         {/* Bottom Bar */}
         <div className="py-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-white/30">
-            &copy; 2025 COMPUTE. All rights reserved.
+            &copy; 2026 DRX. All rights reserved.
           </p>
 
           <div className="flex items-center gap-4 text-sm text-white/30">
-            <span className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#eca8d6]" />
-              All agents operational
-            </span>
+            <span className="relative flex w-2 h-2">
+    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#eca8d6] opacity-75"></span>
+    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#eca8d6]"></span>
+  </span>
+
+  <span>Startup identity active</span>
           </div>
         </div>
       </div>

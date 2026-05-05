@@ -7,25 +7,25 @@ const securityFeatures = [
   {
     icon: Shield,
     title: "Isolated execution",
-    description: "Each agent runs in its own secure sandbox.",
+    description: "Secure, sandboxed execution for every workflow and agent.",
     image: "/images/isolated.jpg",
   },
   {
     icon: Lock,
-    title: "Encrypted memory",
-    description: "Data encrypted at rest and in transit.",
+    title: "Encrypted Identity",
+    description: "Founder, KYC, and company data encrypted at rest and in transit.",
     image: "/images/encrypted.jpg",
   },
   {
     icon: Eye,
-    title: "Full audit trails",
-    description: "Every action logged and inspectable.",
+    title: "Immutable Audit Trails",
+    description: "All actions recorded and verifiable for transparency and compliance.",
     image: "/images/audit.jpg",
   },
   {
     icon: FileCheck,
-    title: "Permission boundaries",
-    description: "Principle of least privilege by design.",
+    title: "Permissioned Access",
+    description: "Role-based, least-privilege access across all stakeholders.",
     image: "/images/permissions.jpg",
   },
 ];
@@ -74,9 +74,9 @@ export function SecuritySection() {
           <h2 className={`text-6xl md:text-7xl lg:text-[128px] font-display tracking-tight leading-[0.9] mb-12 transition-all duration-1000 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}>
-            Autonomous,
+            Verified,
             <br />
-            <span className="text-muted-foreground">not uncontrolled.</span>
+            <span className="text-muted-foreground">Not assumed.</span>
           </h2>
           
           {/* Description — below title */}
@@ -84,7 +84,7 @@ export function SecuritySection() {
             isVisible ? "opacity-100" : "opacity-0"
           }`}>
             <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl">
-              Your agents are powerful but constrained. Enterprise-grade security ensures they only do what you allow.
+              Your systems are powerful yet constrained.Enterprise-grade security ensures agents only perform actions you permit.
             </p>
           </div>
         </div>

@@ -3,40 +3,60 @@
 import { useState, useEffect, useRef } from "react";
 import { ArrowRight, Check, Zap } from "lucide-react";
 
-const plans = [
+type OneTimePrice = {
+  oneTime: number;
+  duration?: string;
+};
+
+type RecurringPrice = {
+  monthly: number | null;
+  annual: number | null;
+};
+
+type Plan = {
+  name: string;
+  description: string;
+  price: OneTimePrice | RecurringPrice;
+  features: string[];
+  cta: string;
+  highlight: boolean;
+};
+
+const plans: Plan[] = [
   {
-    name: "Explorer",
-    description: "For tinkering and small automations",
-    price: { monthly: 0, annual: 0 },
-    features: [
-      "3 concurrent agents",
-      "1,000 tasks/month",
-      "Community support",
-      "Basic logging",
-      "Public integrations",
-    ],
-    cta: "Start free",
-    highlight: false,
-  },
+  name: "Starter",
+  description: "For early founders exploring company formation",
+  price: { oneTime: 0 },
+  features: [
+    "Basic company registration flow",
+    "Entry-level identity verification",
+    "Access to founder community",
+    "Consulting & onboarding guidance",
+    "Standard activity logs",
+    "Public integrations"
+  ],
+  cta: "Start free",
+  highlight: false,
+},
   {
-    name: "Builder",
-    description: "For teams shipping with agents",
-    price: { monthly: 79, annual: 65 },
-    features: [
-      "25 concurrent agents",
-      "50,000 tasks/month",
-      "Priority support",
-      "Full audit trails",
-      "Private integrations",
-      "Team workspaces",
-      "Custom agent roles",
-    ],
-    cta: "Start trial",
-    highlight: true,
-  },
+  name: "Builder",
+  description: "For teams managing company formation at scale",
+  price: { oneTime: 180, duration: "6 months" },
+  features: [
+    "Full company registration support",
+    "Identity verification layer",
+    "Team workspaces",
+    "Private integrations",
+    "Secure audit trails",
+    "Advanced access controls",
+    "Priority support",
+  ],
+  cta: "Get started",
+  highlight: true,
+},
   {
-    name: "Scale",
-    description: "For agent-first organizations",
+    name: "Growth",
+    description: "For founders registering real companies",
     price: { monthly: null, annual: null },
     features: [
       "Unlimited agents",
@@ -139,17 +159,37 @@ export function PricingSection() {
 
                   {/* Price */}
                   <div className="mb-8">
-                    {plan.price.monthly !== null ? (
+                    {"oneTime" in plan.price ? (
                       <div className="flex items-baseline gap-2">
                         <span className="text-5xl lg:text-6xl font-display">
-                          ${isAnnual ? plan.price.annual : plan.price.monthly}
+                          ${plan.price.oneTime}
                         </span>
-                        <span className="text-muted-foreground text-sm">/month</span>
+                        <span className="text-muted-foreground text-sm">
+                          {plan.price.oneTime === 0
+                            ? "free"
+                            : plan.price.duration
+                            ? `one-time / ${plan.price.duration}`
+                            : "one-time"}
+                        </span>
                       </div>
-                    ) : (
-                      <span className="text-4xl font-display">Custom</span>
-                    )}
-                    {plan.price.monthly !== null && plan.price.monthly > 0 && (
+                    ) : (() => {
+                      const recurringPrice = plan.price;
+                      if (recurringPrice.monthly === null) {
+                        return <span className="text-4xl font-display">Custom</span>;
+                      }
+
+                      return (
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-5xl lg:text-6xl font-display">
+                            ${isAnnual ? recurringPrice.annual : recurringPrice.monthly}
+                          </span>
+                          <span className="text-muted-foreground text-sm">/month</span>
+                        </div>
+                      );
+                    })()}
+                    {"monthly" in plan.price &&
+                      plan.price.monthly !== null &&
+                      plan.price.monthly > 0 && (
                       <p className="text-xs text-muted-foreground mt-2 font-mono">
                         {isAnnual ? "billed annually" : "billed monthly"}
                       </p>
@@ -190,15 +230,15 @@ export function PricingSection() {
           <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
             <span className="flex items-center gap-2">
               <Check className="w-4 h-4 text-[#eca8d6]" />
-              Encrypted execution
+              Verifiable startup identity
             </span>
             <span className="flex items-center gap-2">
               <Check className="w-4 h-4 text-[#eca8d6]" />
-              Full audit logs
+             Transparent audit trails
             </span>
             <span className="flex items-center gap-2">
               <Check className="w-4 h-4 text-[#eca8d6]" />
-              Multi-model routing
+              Flexible jurisdiction setup
             </span>
           </div>
           <a href="#" className="text-sm underline underline-offset-4 hover:text-foreground transition-colors">

@@ -16,7 +16,12 @@ export function ExtensionNoiseGuard() {
   useEffect(() => {
     const onUnhandledRejection = (event: PromiseRejectionEvent) => {
       const reason = event.reason;
-      if (isExtensionNoise(reason) || isExtensionNoise((reason as { stack?: string })?.stack)) {
+      if (
+        isExtensionNoise(reason) ||
+        isExtensionNoise((reason as { message?: string })?.message) ||
+        isExtensionNoise((reason as { stack?: string })?.stack)
+      ) {
+        event.stopImmediatePropagation();
         event.preventDefault();
       }
     };
@@ -25,18 +30,20 @@ export function ExtensionNoiseGuard() {
       if (
         isExtensionNoise(event.message) ||
         isExtensionNoise(event.filename) ||
+        isExtensionNoise(event.error?.message) ||
         isExtensionNoise(event.error?.stack)
       ) {
+        event.stopImmediatePropagation();
         event.preventDefault();
       }
     };
 
-    window.addEventListener("unhandledrejection", onUnhandledRejection);
-    window.addEventListener("error", onError);
+    window.addEventListener("unhandledrejection", onUnhandledRejection, true);
+    window.addEventListener("error", onError, true);
 
     return () => {
-      window.removeEventListener("unhandledrejection", onUnhandledRejection);
-      window.removeEventListener("error", onError);
+      window.removeEventListener("unhandledrejection", onUnhandledRejection, true);
+      window.removeEventListener("error", onError, true);
     };
   }, []);
 

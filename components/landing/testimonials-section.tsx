@@ -5,35 +5,34 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const testimonials = [
   {
-    quote: "Our agents handle 80% of our customer support tickets autonomously. The ROI was immediate.",
+    quote: "We registered our company in minutes. The process was clear, fast, and reliable.",
     author: "Sarah Chen",
-    role: "CTO",
+    role: "Founder",
     company: "Meridian Labs",
-    metric: { value: "80%", label: "Ticket resolution" },
+    metric: { value: "15 min", label: "Setup time" },
   },
   {
-    quote: "We deployed research agents that work 24/7. They surface insights we'd never find manually.",
+    quote: "From identity verification to registration, everything just works without friction.",
     author: "Marcus Webb",
-    role: "Head of Research",
+    role: "Co-Founder",
     company: "Flux Systems",
-    metric: { value: "10x", label: "Research output" },
+    metric: { value: "100%", label: "Verification success" },
   },
   {
-    quote: "The multi-agent orchestration is incredible. Complex workflows that took weeks now run in hours.",
+    quote: "Finally a system that makes company formation simple and trusted across borders.",
     author: "Elena Rodriguez",
-    role: "VP Engineering",
+    role: "CEO",
     company: "Beacon AI",
-    metric: { value: "40x", label: "Faster workflows" },
+    metric: { value: "3x", label: "Faster formation" },
   },
   {
-    quote: "Security was our biggest concern. The sandboxing and audit trails gave us full confidence.",
+    quote: "We were able to formalize our business quickly and gain instant credibility.",
     author: "James Liu",
-    role: "CISO",
+    role: "Co-Founder",
     company: "Prism Analytics",
-    metric: { value: "0", label: "Security incidents" },
+    metric: { value: "0", label: "Compliance issues" },
   },
 ];
-
 const ASCII_ROWS = 60;
 const ASCII_COLS = 100;
 
