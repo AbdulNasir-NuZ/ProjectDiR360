@@ -29,7 +29,7 @@ const testimonials = [
     quote: "We were able to formalize our business quickly and gain instant credibility.",
     author: "James Liu",
     role: "Co-Founder",
-    company: "Prism Analytics",
+    company: "Prisma Analytics",
     metric: { value: "0", label: "Compliance issues" },
   },
 ];
