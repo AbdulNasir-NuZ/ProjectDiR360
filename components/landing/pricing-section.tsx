@@ -247,7 +247,7 @@ export function PricingSection() {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .text-stroke {
           -webkit-text-stroke: 1.5px currentColor;
           -webkit-text-fill-color: transparent;
