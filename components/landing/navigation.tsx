@@ -33,13 +33,13 @@ export function Navigation() {
           : "top-0 left-0 right-0"
       }`}
     >
-      <nav 
-        className={`mx-auto transition-all duration-500 ${
-          isScrolled || isMobileMenuOpen
-            ? "bg-background/80 backdrop-blur-xl border border-foreground/10 rounded-2xl shadow-lg max-w-300"
-            : "bg-transparent max-w-350"
-        }`}
-      >
+     <nav 
+  className={`mx-auto transition-all duration-500 ${
+    isScrolled || isMobileMenuOpen
+      ? "bg-background/80 backdrop-blur-xl shadow-lg max-w-300 border border-white/10"
+      : "bg-transparent max-w-350 border border-white/20"
+  }`}
+>
         <div 
           className={`flex items-center justify-between transition-all duration-500 px-6 lg:px-8 ${
             isScrolled ? "h-14" : "h-20"

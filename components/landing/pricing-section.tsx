@@ -54,23 +54,24 @@ const plans: Plan[] = [
   cta: "Get started",
   highlight: true,
 },
+
   {
-    name: "Growth",
-    description: "For founders registering real companies",
-    price: { monthly: null, annual: null },
-    features: [
-      "Unlimited agents",
-      "Unlimited tasks",
-      "24/7 dedicated support",
-      "On-premise deployment",
-      "SLA guarantee",
-      "Custom LLM routing",
-      "Advanced security",
-      "Dedicated compute",
-    ],
-    cta: "Contact sales",
-    highlight: false,
-  },
+  name: "Growth",
+  description: "For founders scaling and formalizing globally",
+  price: { monthly: null, annual: null },
+  features: [
+    "Unlimited startup identities",
+    "Multi-jurisdiction registration support",
+    "Dedicated onboarding & legal assistance",
+    "Private partner integrations",
+    "Advanced audit & compliance layer",
+    "Custom workflow configuration",
+    "Priority infrastructure access",
+    "Dedicated support",
+  ],
+  cta: "Contact sales",
+  highlight: false,
+},
 ];
 
 export function PricingSection() {

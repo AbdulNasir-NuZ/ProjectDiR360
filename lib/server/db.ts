@@ -1,30 +1,38 @@
 import { Pool } from "pg";
 
-const connectionString = process.env.DATABASE_URL;
-
-if (!connectionString) {
-  throw new Error("Missing DATABASE_URL");
-}
-
 const globalForDb = globalThis as typeof globalThis & {
   dbPool?: Pool;
   dbInitialized?: boolean;
 };
 
-export const db =
-  globalForDb.dbPool ??
-  new Pool({
+function getConnectionString() {
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error("Missing DATABASE_URL");
+  }
+  return connectionString;
+}
+
+function getDbPool() {
+  if (globalForDb.dbPool) return globalForDb.dbPool;
+
+  const connectionString = getConnectionString();
+  const pool = new Pool({
     connectionString,
     ssl: connectionString.includes("sslmode=require") ? { rejectUnauthorized: false } : undefined,
   });
 
-if (process.env.NODE_ENV !== "production") {
-  globalForDb.dbPool = db;
+  if (process.env.NODE_ENV !== "production") {
+    globalForDb.dbPool = pool;
+  }
+
+  return pool;
 }
 
 export async function ensureSchema() {
   if (globalForDb.dbInitialized) return;
 
+  const db = getDbPool();
   await db.query(`
     CREATE TABLE IF NOT EXISTS users (
       id BIGSERIAL PRIMARY KEY,
@@ -68,3 +76,10 @@ export async function ensureSchema() {
 
   globalForDb.dbInitialized = true;
 }
+
+export const db = new Proxy({} as Pool, {
+  get(_target, prop, receiver) {
+    const pool = getDbPool() as unknown as Record<PropertyKey, unknown>;
+    return Reflect.get(pool, prop, receiver);
+  },
+});
