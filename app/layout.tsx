@@ -7,9 +7,10 @@ import { Web3Provider } from '@/components/web3/web3-provider'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'COMPUTE - AI Agents for Distributed Computing',
-  description: 'Deploy autonomous AI agents on distributed infrastructure. Offload complex tasks to intelligent workers that run 24/7.',
-  generator: 'v0.app',
+  title: 'DRX 360 — Digital formation, entities that incorporate',
+  description:
+    'Verifiable startup identity for modern founders. Create, trust, and formalize your venture in one seamless workflow.',
+  generator: 'DRX 360',
 }
 
 export default function RootLayout({
