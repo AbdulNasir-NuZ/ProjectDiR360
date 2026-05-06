@@ -1,11 +1,19 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { setAuth } from "@/lib/auth";
 
 export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={<AuthCallbackFallback />}>
+      <AuthCallbackClient />
+    </Suspense>
+  );
+}
+
+function AuthCallbackClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -29,6 +37,12 @@ export default function AuthCallbackPage() {
     router.replace("/auth");
   }, [router, searchParams]);
 
+  return (
+    <AuthCallbackFallback />
+  );
+}
+
+function AuthCallbackFallback() {
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="flex items-center gap-2 text-muted-foreground">

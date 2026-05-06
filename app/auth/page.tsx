@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, ReactNode, Suspense, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
@@ -12,6 +12,14 @@ import { API_BASE_URL, apiRequest } from "@/lib/api";
 import { setAuth } from "@/lib/auth";
 
 export default function AuthPage() {
+  return (
+    <Suspense fallback={<AuthPageShell />}>
+      <AuthPageClient />
+    </Suspense>
+  );
+}
+
+function AuthPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryMode = searchParams.get("mode");
@@ -88,6 +96,81 @@ export default function AuthPage() {
   };
 
   return (
+    <AuthPageShell isLogin={isLogin}>
+      <Card className="mx-auto w-full max-w-md border-white/10 bg-black/60 backdrop-blur-md lg:ml-auto">
+        <CardHeader>
+          <CardTitle className="text-white">{title}</CardTitle>
+          <CardDescription className="text-zinc-400">Login with email, Google, or MetaMask.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-2">
+            <Button variant={mode === "login" ? "default" : "outline"} onClick={() => setMode("login")}>Login</Button>
+            <Button variant={mode === "signup" ? "default" : "outline"} onClick={() => setMode("signup")}>Sign up</Button>
+          </div>
+
+          <form className="space-y-3" onSubmit={submit}>
+            <Input type="email" placeholder="Email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+            <div className="relative">
+              <Input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="pr-10"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-1/2 size-8 -translate-y-1/2"
+                onClick={() => setShowPassword((prev) => !prev)}
+              >
+                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              </Button>
+            </div>
+            {mode === "signup" && (
+              <div className="relative">
+                <Input
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-1 top-1/2 size-8 -translate-y-1/2"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                >
+                  {showConfirmPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </Button>
+              </div>
+            )}
+            {(error || oauthError) && <p className="text-sm text-red-400">{error ?? oauthError}</p>}
+            <Button className="w-full" type="submit" disabled={loading}>
+              {loading ? <Loader2 className="size-4 animate-spin" /> : <ShieldCheck className="size-4" />}
+              {mode === "login" ? "Login" : "Create account"}
+            </Button>
+          </form>
+
+          <div className="space-y-2">
+            <Button variant="outline" className="w-full" onClick={continueWithGoogle}>
+              Continue with Google
+            </Button>
+            <WalletConnect onConnected={continueWithWallet} />
+          </div>
+        </CardContent>
+      </Card>
+    </AuthPageShell>
+  );
+}
+
+function AuthPageShell({ children, isLogin = true }: { children?: ReactNode; isLogin?: boolean }) {
+  return (
     <div className="relative min-h-screen overflow-hidden bg-[#03070d]">
       <div className="pointer-events-none absolute inset-0 opacity-35">
         <div className="absolute -left-20 top-20 h-72 w-72 rounded-full bg-cyan-500/15 blur-3xl" />
@@ -130,74 +213,17 @@ export default function AuthPage() {
           </div>
         </div>
 
-        <Card className="mx-auto w-full max-w-md border-white/10 bg-black/60 backdrop-blur-md lg:ml-auto">
-          <CardHeader>
-            <CardTitle className="text-white">{title}</CardTitle>
-            <CardDescription className="text-zinc-400">Login with email, Google, or MetaMask.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-2">
-              <Button variant={mode === "login" ? "default" : "outline"} onClick={() => setMode("login")}>Login</Button>
-              <Button variant={mode === "signup" ? "default" : "outline"} onClick={() => setMode("signup")}>Sign up</Button>
-            </div>
-
-            <form className="space-y-3" onSubmit={submit}>
-              <Input type="email" placeholder="Email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-              <div className="relative">
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pr-10"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-1 top-1/2 size-8 -translate-y-1/2"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                >
-                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                </Button>
-              </div>
-              {mode === "signup" && (
-                <div className="relative">
-                  <Input
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Confirm password"
-                    required
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pr-10"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-1 top-1/2 size-8 -translate-y-1/2"
-                    onClick={() => setShowConfirmPassword((prev) => !prev)}
-                  >
-                    {showConfirmPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                  </Button>
-                </div>
-              )}
-              {(error || oauthError) && <p className="text-sm text-red-400">{error ?? oauthError}</p>}
-              <Button className="w-full" type="submit" disabled={loading}>
-                {loading ? <Loader2 className="size-4 animate-spin" /> : <ShieldCheck className="size-4" />}
-                {mode === "login" ? "Login" : "Create account"}
-              </Button>
-            </form>
-
-            <div className="space-y-2">
-              <Button variant="outline" className="w-full" onClick={continueWithGoogle}>
-                Continue with Google
-              </Button>
-              <WalletConnect onConnected={continueWithWallet} />
-            </div>
-          </CardContent>
-        </Card>
+        {children ?? (
+          <Card className="mx-auto w-full max-w-md border-white/10 bg-black/60 backdrop-blur-md lg:ml-auto">
+            <CardHeader>
+              <CardTitle className="text-white">Welcome back</CardTitle>
+              <CardDescription className="text-zinc-400">Login with email, Google, or MetaMask.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="h-[420px] animate-pulse rounded-md bg-white/5" />
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
