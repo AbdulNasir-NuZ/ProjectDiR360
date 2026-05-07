@@ -1,17 +1,19 @@
 "use client";
 
-const TOKEN_KEY = "dire_auth_token";
+const TOKEN_KEY = "dire_access_token";
 const USER_KEY = "dire_auth_user";
 
 export type StoredUser = {
+  id?: string;
   email: string;
   walletAddress?: string;
   fullName?: string;
+  kycStatus?: "pending" | "approved" | "rejected" | "not_submitted";
 };
 
-export function setAuth(token: string, user: StoredUser) {
+export function setAuth(accessToken: string, user: StoredUser) {
   if (typeof window === "undefined") return;
-  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(TOKEN_KEY, accessToken);
   localStorage.setItem(USER_KEY, JSON.stringify(user));
 }
 
