@@ -1,20 +1,27 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { apiRequest, KycStatus, NftStatus } from "@/lib/api";
+import { api, CompanyResponse, KycStatus, NftStatus } from "@/lib/api";
 import { getAuthToken, getStoredUser, StoredUser } from "@/lib/auth";
 
 export type DashboardState = {
   user: StoredUser | null;
   kycStatus: KycStatus;
   nftStatus: NftStatus;
-  company?: { name: string; description: string } | null;
+  company: CompanyResponse | null;
 };
+
+function deriveNftStatus(company: CompanyResponse | null): NftStatus {
+  if (!company) return "not_minted";
+  if (company.nftTokenId) return "minted";
+  if (company.status === "pending") return "pending";
+  return "not_minted";
+}
 
 export function useDashboardState() {
   const [state, setState] = useState<DashboardState>({
     user: getStoredUser(),
-    kycStatus: "not_submitted",
+    kycStatus: getStoredUser()?.kycStatus ?? "not_submitted",
     nftStatus: "not_minted",
     company: null,
   });
@@ -22,23 +29,23 @@ export function useDashboardState() {
 
   const refresh = useCallback(async () => {
     const token = getAuthToken();
-    if (!token) return;
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
     setLoading(true);
     try {
-      const [kyc, nft, company] = await Promise.allSettled([
-        apiRequest<{ status: KycStatus }>("/kyc/status", {}, token),
-        apiRequest<{ status: NftStatus }>("/nft/status", {}, token),
-        apiRequest<{ company: { name: string; description: string } | null }>("/company/me", {}, token),
-      ]);
+      const companies = await api.getMyCompanies(token).catch(() => [] as CompanyResponse[]);
+      const company = companies[0] ?? null;
+      const stored = getStoredUser();
 
-      setState((prev) => ({
-        ...prev,
-        user: getStoredUser(),
-        kycStatus: kyc.status === "fulfilled" ? kyc.value.status : prev.kycStatus,
-        nftStatus: nft.status === "fulfilled" ? nft.value.status : prev.nftStatus,
-        company: company.status === "fulfilled" ? company.value.company : prev.company,
-      }));
+      setState({
+        user: stored,
+        kycStatus: stored?.kycStatus ?? "not_submitted",
+        nftStatus: deriveNftStatus(company),
+        company,
+      });
     } finally {
       setLoading(false);
     }

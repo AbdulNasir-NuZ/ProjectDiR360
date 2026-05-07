@@ -3,12 +3,11 @@
 import { FormEvent, ReactNode, Suspense, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, Loader2, ShieldCheck, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { WalletConnect } from "@/components/onboarding/wallet-connect";
-import { API_BASE_URL, apiRequest } from "@/lib/api";
+import { api } from "@/lib/api";
 import { setAuth } from "@/lib/auth";
 
 export default function AuthPage() {
@@ -30,10 +29,9 @@ function AuthPageClient() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [walletAddress, setWalletAddress] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const oauthError = searchParams.get("error");
 
   const title = useMemo(() => (mode === "login" ? "Welcome back" : "Create account"), [mode]);
   const isLogin = mode === "login";
@@ -50,48 +48,42 @@ function AuthPageClient() {
     setLoading(true);
 
     try {
-      const endpoint = mode === "signup" ? "/auth/signup" : "/auth/login";
-      const payload = await apiRequest<{ token: string; user?: { email: string; walletAddress?: string } }>(endpoint, {
-        method: "POST",
-        body: JSON.stringify({ email: email.trim(), password: password.trim(), walletAddress }),
-      });
+      const trimmedEmail = email.trim();
+      const trimmedPassword = password.trim();
 
-      setAuth(payload.token, {
-        email: payload.user?.email ?? email,
-        walletAddress: payload.user?.walletAddress ?? walletAddress,
+      if (mode === "signup") {
+        await api.signup({ email: trimmedEmail, password: trimmedPassword });
+      }
+
+      const auth = await api.login({ email: trimmedEmail, password: trimmedPassword });
+
+      setAuth(auth.accessToken, {
+        id: auth.user.id,
+        email: auth.user.email,
       });
 
       router.push("/dashboard");
     } catch (err) {
-      const apiError = err as { message?: string };
-      setError(apiError?.message ?? (err instanceof Error ? err.message : "Auth failed"));
+      setError(err instanceof Error ? err.message : "Auth failed");
     } finally {
       setLoading(false);
     }
   };
 
-  const continueWithGoogle = () => {
-    const redirect = `${window.location.origin}/auth/callback`;
-    window.location.href = `${API_BASE_URL}/auth/google?redirect=${encodeURIComponent(redirect)}`;
-  };
-
-  const continueWithWallet = async (address: string) => {
-    setWalletAddress(address);
+  const continueWithDemo = async () => {
+    setError(null);
+    setDemoLoading(true);
     try {
-      setLoading(true);
-      const payload = await apiRequest<{ token: string; user?: { email: string; walletAddress?: string } }>("/auth/wallet", {
-        method: "POST",
-        body: JSON.stringify({ walletAddress: address }),
-      });
-      setAuth(payload.token, {
-        email: payload.user?.email ?? "wallet-user@local",
-        walletAddress: payload.user?.walletAddress ?? address,
+      const auth = await api.loginDemo();
+      setAuth(auth.accessToken, {
+        id: auth.user.id,
+        email: auth.user.email,
       });
       router.push("/dashboard");
-    } catch {
-      setError("Wallet connected. Continue with email auth or ensure /auth/wallet is available.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Demo login failed");
     } finally {
-      setLoading(false);
+      setDemoLoading(false);
     }
   };
 
@@ -100,16 +92,28 @@ function AuthPageClient() {
       <Card className="mx-auto w-full max-w-md border-white/10 bg-black/60 backdrop-blur-md lg:ml-auto">
         <CardHeader>
           <CardTitle className="text-white">{title}</CardTitle>
-          <CardDescription className="text-zinc-400">Login with email, Google, or MetaMask.</CardDescription>
+          <CardDescription className="text-zinc-400">
+            Sign in with your email or use the demo account.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-2">
-            <Button variant={mode === "login" ? "default" : "outline"} onClick={() => setMode("login")}>Login</Button>
-            <Button variant={mode === "signup" ? "default" : "outline"} onClick={() => setMode("signup")}>Sign up</Button>
+            <Button variant={mode === "login" ? "default" : "outline"} onClick={() => setMode("login")}>
+              Login
+            </Button>
+            <Button variant={mode === "signup" ? "default" : "outline"} onClick={() => setMode("signup")}>
+              Sign up
+            </Button>
           </div>
 
           <form className="space-y-3" onSubmit={submit}>
-            <Input type="email" placeholder="Email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input
+              type="email"
+              placeholder="Email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
             <div className="relative">
               <Input
                 type={showPassword ? "text" : "password"}
@@ -150,18 +154,32 @@ function AuthPageClient() {
                 </Button>
               </div>
             )}
-            {(error || oauthError) && <p className="text-sm text-red-400">{error ?? oauthError}</p>}
-            <Button className="w-full" type="submit" disabled={loading}>
+            {error && <p className="text-sm text-red-400">{error}</p>}
+            <Button className="w-full" type="submit" disabled={loading || demoLoading}>
               {loading ? <Loader2 className="size-4 animate-spin" /> : <ShieldCheck className="size-4" />}
               {mode === "login" ? "Login" : "Create account"}
             </Button>
           </form>
 
           <div className="space-y-2">
-            <Button variant="outline" className="w-full" onClick={continueWithGoogle}>
-              Continue with Google
+            <div className="flex items-center gap-3 text-xs uppercase tracking-wider text-zinc-500">
+              <span className="h-px flex-1 bg-white/10" />
+              or
+              <span className="h-px flex-1 bg-white/10" />
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={continueWithDemo}
+              disabled={loading || demoLoading}
+            >
+              {demoLoading ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
+              Use demo account
             </Button>
-            <WalletConnect onConnected={continueWithWallet} />
+            <p className="text-center text-xs text-zinc-500">
+              Connect a wallet from the dashboard after signing in.
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -200,9 +218,11 @@ function AuthPageShell({ children, isLogin = true }: { children?: ReactNode; isL
 
           <div className="relative z-10">
             <p className="mb-4 text-xs uppercase tracking-widest text-[#bda87a]">Digital Identity Layer</p>
-            <h1 className="font-display text-5xl leading-[1] text-white">Secure onboarding for verifiable companies.</h1>
+            <h1 className="font-display text-5xl leading-[1] text-white">
+              Secure onboarding for verifiable companies.
+            </h1>
             <p className="mt-6 max-w-md text-zinc-300">
-            Connect identity, compliance, and ownership in one continuous Web3-native flow.
+              Connect identity, compliance, and ownership in one continuous Web3-native flow.
             </p>
           </div>
 
@@ -217,7 +237,9 @@ function AuthPageShell({ children, isLogin = true }: { children?: ReactNode; isL
           <Card className="mx-auto w-full max-w-md border-white/10 bg-black/60 backdrop-blur-md lg:ml-auto">
             <CardHeader>
               <CardTitle className="text-white">Welcome back</CardTitle>
-              <CardDescription className="text-zinc-400">Login with email, Google, or MetaMask.</CardDescription>
+              <CardDescription className="text-zinc-400">
+                Sign in with your email or use the demo account.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="h-[420px] animate-pulse rounded-md bg-white/5" />
