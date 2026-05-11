@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 
@@ -46,9 +47,16 @@ export function Navigation() {
           }`}
         >
           {/* Logo */}
-          <a href="#" className="flex items-center gap-2 group">
-            <span className={`font-display tracking-tight transition-all duration-500 ${isScrolled ? "text-xl text-foreground" : "text-2xl text-white"}`}>DRX</span>
-            <span className={`font-mono transition-all duration-500 ${isScrolled ? "text-[10px] mt-0.5 text-muted-foreground" : "text-xs mt-1 text-white/60"}`}>360</span>
+          <a href="#" className="flex items-center gap-3 group">
+            <Image
+              src="/axoris-logo.png"
+              alt="AXORIS logo"
+              width={32}
+              height={32}
+              className="h-8 w-8 rounded-sm object-cover"
+              priority
+            />
+            <span className={`font-display tracking-tight transition-all duration-500 ${isScrolled ? "text-xl text-foreground" : "text-2xl text-white"}`}>AXORIS</span>
           </a>
 
           {/* Desktop Navigation */}

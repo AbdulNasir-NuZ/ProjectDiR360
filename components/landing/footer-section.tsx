@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowUpRight } from "lucide-react";
+import Image from "next/image";
 
 const footerLinks = {
   Product: [
@@ -56,9 +57,15 @@ export function FooterSection() {
           <div className="grid grid-cols-2 md:grid-cols-6 gap-12 lg:gap-8">
             {/* Brand Column */}
             <div className="col-span-2">
-              <a href="#" className="inline-flex items-center gap-2 mb-6">
-                <span className="text-2xl font-display text-white">DRX</span>
-                <span className="text-xs text-white/40 font-mono">360</span>
+              <a href="#" className="inline-flex items-center gap-3 mb-6">
+                <Image
+                  src="/axoris-logo.png"
+                  alt="AXORIS logo"
+                  width={36}
+                  height={36}
+                  className="h-9 w-9 rounded-sm object-cover"
+                />
+                <span className="text-2xl font-display text-white">AXORIS</span>
               </a>
 
               <p className="text-white/50 leading-relaxed mb-8 max-w-xs text-sm">
@@ -109,7 +116,7 @@ export function FooterSection() {
         {/* Bottom Bar */}
         <div className="py-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-white/30">
-            &copy; 2026 DRX. All rights reserved.
+            &copy; 2026 AXORIS. All rights reserved.
           </p>
 
           <div className="flex items-center gap-4 text-sm text-white/30">

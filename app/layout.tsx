@@ -7,10 +7,10 @@ import { Web3Provider } from '@/components/web3/web3-provider'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'DRX 360 — Digital formation, entities that incorporate',
+  title: 'AXORIS - Digital formation, entities that incorporate',
   description:
     'Verifiable startup identity for modern founders. Create, trust, and formalize your venture in one seamless workflow.',
-  generator: 'DRX 360',
+  generator: 'AXORIS',
 }
 
 export default function RootLayout({
@@ -91,3 +91,4 @@ export default function RootLayout({
     </html>
   )
 }
+
